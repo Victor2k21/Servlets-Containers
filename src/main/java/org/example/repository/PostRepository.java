@@ -1,51 +1,34 @@
-package org.example.repository;
+package ru.netology.repository;
 
-import org.example.exception.NotFoundException;
-import org.example.model.Post;
+import ru.netology.model.Post;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static org.example.servlet.MainServlet.threadPool;
-
-// Stub
 public class PostRepository {
-    
-    private static final ConcurrentHashMap<Long, Post> postMap = new ConcurrentHashMap<>();
-    
+    private final Map<Long, Post> list = new HashMap<>();
+    private final AtomicLong postID = new AtomicLong();
+
     public List<Post> all() {
-        if (postMap.isEmpty()) {
-            throw new NotFoundException("Список постов пуст");
-        }
-        List<Post> data = new ArrayList<>();
-        for (Map.Entry<Long, Post> entry : postMap.entrySet()) {
-            data.add(entry.getValue());
-        }
-         return data;
+        return new ArrayList<>(list.values());
+
     }
-    
+
     public Optional<Post> getById(long id) {
-        if (postMap.containsKey(id)) {
-            return Optional.ofNullable(postMap.get(id));
-        }
-        throw new NotFoundException("Неверный идентификатор поста");
+        return Optional.ofNullable(list.get(id));
     }
-    
-    public Post save(Post post) throws ExecutionException, InterruptedException {
-             if (postMap.containsKey(post.getId())) {
-                postMap.put(post.getId(), post);
-            } else {
-                Post newPost = new Post(post.getContent());
-                postMap.put(newPost.getId(), newPost);
-                return newPost;
-            }
-            return post;
-        }
- 
+
+    public Post save(Post post) {
+        postID.incrementAndGet();
+        list.put(postID.get(), post);
+        return post;
+    }
+
     public void removeById(long id) {
-        postMap.remove(id);
+        try {
+            list.remove(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
