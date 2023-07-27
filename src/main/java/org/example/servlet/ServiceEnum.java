@@ -3,12 +3,12 @@ package org.example.servlet;
 import java.util.HashMap;
 
 public enum ServiceEnum {
-    
+
     ALL,
     GET_BY_ID,
     SAVE,
     REMOVE;
-    
+
     public static HashMap<String, ServiceEnum> getServEnum(MethEnum meth) {
         HashMap<String, ServiceEnum> serv = new HashMap<>();
         switch (meth) {
